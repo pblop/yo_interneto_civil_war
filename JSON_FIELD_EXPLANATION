@@ -1,0 +1,40 @@
+# messages.json
+
+- encounter: message to be displayed whenever two people meet in the game.
+Format values available: {0}, {1} (these will be replaced with the following
+data)
+	- {0}: Person 1's name
+	- {1}: Person 2's name
+- kill: message to be displayed whenever someone kills another person in
+the game.
+Format values available: {0}, {1}, {2}
+	- {0}: Killer's name
+        - {1}: Dead person's name
+        - {2}: Amount of people remaining
+
+- tie: message to be displayed whenever an encounter results in a tie.
+Format values available: {0}, {1}, {2}
+        - {0}: Person 1's name
+        - {1}: Person 2's name
+        - {2}: Amount of people remaining
+
+- win: message to be displayed when someone has won the game.
+Format values available: {0}
+        - {0}: Winner's name
+
+- win: message to be displayed when the game starts.
+Format values available: {0}
+        - {0}: Amount of players
+
+# tweet.json
+
+- consumer_key, consumer_secret: app values obtained by creating an app
+at https://developer.twitter.com
+- access_token, access_token_secret: client values obtained by running 
+get_access_token_tweetpy.py and following on-screen instructions
+
+# config.json
+
+- encounter_duration: time between the announcement of an encounter and the
+announcement of its result (in seconds)
+- encounter_delay: time between encounters (in seconds)

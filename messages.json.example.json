@@ -1,0 +1,7 @@
+{
+  "encounter": "Se han encontrado {0} y {1}",
+  "kill": "{0} ha matado a {1}, quedan {2}",
+  "tie": "{0} y {1} se han liado el porro de la paz, queda(n) {2}",
+  "win": "¡GAMERS, HA GANADO {0}!",
+  "start": "GAMERS, ATENCIÓN. DAN COMIENZO LOS JUEGOS DEL HAMBRE CON {0} JUGADORES.\nQUE LA SUERTE ESTÉ SIEMPRE DE VUESTRO LADO."
+}

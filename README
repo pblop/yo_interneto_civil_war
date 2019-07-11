@@ -1,0 +1,16 @@
+Yo Interneto civil war bot
+
+Written in Python3
+
+# get_access_token_tweetpy.py - uses tweetpy to get access_token and
+access_token_secret for the main.py script
+# delete_tweets.py - calls tweet.py to delete every tweet
+# tweet.py - simple interface for tweeting and deleting tweets using the data
+provided in tweet.json. (uses twython)
+# generate_image.py - uses Pillow to generate an image with the remaining
+alive participants
+# main.py - game logic mixed with logging logic (tweet, console log and text 
+and image logs)
+
+Copyright (c) Pablo Pérez Rodrguez (pablo.rabanales@gmail.com) and Miguel Pérez León (perezleon@gmail.com)
+
