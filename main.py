@@ -54,6 +54,7 @@ def main():
 
     encounter_duration = config['encounter_duration']
     encounter_delay = config['encounter_delay']
+
     i = 0
     alive_participants = [participant for participant in participants if participant.isalive()]
     while len(alive_participants) > 1:
@@ -80,8 +81,9 @@ def main():
             log(messages['tie'].format(p1.name, p2.name, len(alive_participants)), i, participants)
 
         i += 1
+        if len(alive_participants) == 1:
+            break
         sleep(encounter_delay)
-
     log(messages['win'].format(alive_participants[0].name), 'end', participants)
 
 if __name__ == '__main__':

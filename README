@@ -9,8 +9,8 @@ access_token_secret for the main.py script
 provided in tweet.json. (uses twython)
 # generate_image.py - uses Pillow to generate an image with the remaining
 alive participants
-# main.py - game logic mixed with logging logic (tweet, console log and text 
+# main.py - game logic mixed with logging logic (tweet, console log and text
 and image logs)
+# participants.py - you can execute this to save an image of the participants at ./participants.png
 
-Copyright (c) Pablo Pérez Rodrguez (pablo.rabanales@gmail.com) and Miguel Pérez León (perezleon@gmail.com)
-
+Copyright (c) Pablo Pérez Rodríguez (pablo.rabanales@gmail.com) and Miguel Pérez León (perezleon@gmail.com)
