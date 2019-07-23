@@ -5,7 +5,7 @@ tweet.json
 __pycache__/
 logs/
 venv/
-
+dead.txt
 
 .DS_Store
 .AppleDouble

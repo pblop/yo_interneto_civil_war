@@ -1,11 +1,23 @@
 import json
 import random
+import threading
+from twython.exceptions import TwythonError
 from tweet import tweet
+from tweet import init as init_tweet
 from generate_image import draw_participants
 from enum import Enum
 from time import sleep
+import os
 
 config = json.load(open('./config.json', 'r'))
+
+def add_dead_participant(participant):
+    if os.path.exists('dead.txt'):
+        with open('dead.txt', 'a') as f:
+            f.write(participant.name + '\n')
+    else:
+        with open('dead.txt', 'w') as f:
+            pass
 
 class Participant:
     def __init__(self, name):
@@ -17,6 +29,7 @@ class Participant:
 
     def kill(self):
         self.alive = False
+        add_dead_participant(self)
 
 def get_participants():
     participants = []
@@ -29,25 +42,50 @@ def get_participants():
             participants.append(Participant(name))
     return participants
 
+def set_dead_participants(participants):
+    with open('dead.txt', 'r') as f:
+        while True:
+            line = f.readline()
+            if line == '':
+                break
+            name = line.replace('\n', '')
+            print(name)
+            participant = [participant for participant in participants if participant.name == name][0]
+            participant.alive = False
+
 def get_messages():
     return json.load(open('messages.json', 'r'))
 
-def log(msg, encounter_number, participants):
-    print(f'[{encounter_number}] {msg}')
-    with open(f'logs/{encounter_number}.txt', 'a') as f:
-        f.write(msg + '\n')
-    if participants is not None:
-        img_path = f'logs/{encounter_number}.png'
-        img = draw_participants(participants)
-        img.save(img_path)
+class Queue:
+    def __init__(self):
+        self.list = []
 
-        tweet(msg, img_path)
-    else:
-        tweet(msg)
+    def log(self, msg, encounter_number, participants):
+        print(f'[{encounter_number}] {msg}')
+        with open(f'logs/{encounter_number}.txt', 'a') as f:
+            f.write(msg + '\n')
+        if participants is not None:
+            img_path = f'logs/{encounter_number}.png'
+            img = draw_participants(participants)
+            img.save(img_path)
 
-def main():
+            self.list.append((msg, img_path, ))
+            # tweet(msg, img_path)
+        else:
+            self.list.append((msg, ))
+            # tweet(msg)
+
+    def pop(self):
+        if len(self.list) > 0:
+            return self.list.pop(0)
+        else:
+            return None
+
+game_finished = False
+
+def main_thread(queue):
     participants = get_participants()
-    print(len(participants))
+    set_dead_participants(participants)
     messages = get_messages()
 
     log(messages['start'].format(len(participants)), -1, participants)
@@ -60,7 +98,7 @@ def main():
     while len(alive_participants) > 1:
         p1, p2 = random.sample(alive_participants, 2)
 
-        log(messages['encounter'].format(p1.name, p2.name), i, participants=None)
+        queue.log(messages['encounter'].format(p1.name, p2.name), i, participants=None)
         sleep(encounter_duration)
 
         p1_val = random.random()
@@ -70,21 +108,46 @@ def main():
             # P1 wins
             p2.kill()
             alive_participants = [participant for participant in participants if participant.isalive()]
-            log(messages['kill'].format(p1.name, p2.name, len(alive_participants)), i, participants)
+            queue.log(messages['kill'].format(p1.name, p2.name, len(alive_participants)), i, participants)
         elif p1_val < p2_val:
             # P2 wins
             p1.kill()
             alive_participants = [participant for participant in participants if participant.isalive()]
-            log(messages['kill'].format(p2.name, p1.name, len(alive_participants)), i, participants)
+            queue.log(messages['kill'].format(p2.name, p1.name, len(alive_participants)), i, participants)
         elif p1_val == p2_val:
             # Tie
-            log(messages['tie'].format(p1.name, p2.name, len(alive_participants)), i, participants)
+            queue.log(messages['tie'].format(p1.name, p2.name, len(alive_participants)), i, participants)
 
         i += 1
         if len(alive_participants) == 1:
             break
         sleep(encounter_delay)
-    log(messages['win'].format(alive_participants[0].name), 'end', participants)
+    queue.log(messages['win'].format(alive_participants[0].name), 'end', participants)
+
+def tweeter_thread(queue):
+    while True:
+        item = queue.pop()
+        if item is not None:
+            tweeted = False
+            while not tweeted:
+                try:
+                    if len(item) == 1:
+                        tweet(item[0])
+                        tweeted = True
+                    elif len(item) == 2:
+                        tweeted = tweet(item[0], item[1])
+                        tweeted = True
+                except TwythonError as e:
+                    print('Twython Error')
+                    print(e)
+                    init_tweet()
+                    tweeted = False
 
 if __name__ == '__main__':
-    main()
+    init_tweet()
+    tweet_queue = Queue()
+    thread_main = threading.Thread(target=main_thread, args=(tweet_queue, ))
+    thread_tweet = threading.Thread(target=tweeter_thread, args=(tweet_queue, ))
+    thread_main.start()
+    thread_tweet.start()
+    # main()

@@ -29,12 +29,24 @@ def get_participants():
             participants.append(Participant(name))
     return participants
 
+def set_dead_participants(participants):
+    with open('dead.txt', 'r') as f:
+        while True:
+            line = f.readline()
+            if line == '':
+                break
+            name = line.replace('\n', '')
+            print(name)
+            participant = [participant for participant in participants if participant.name == name][0]
+            participant.kill()
+
 def get_messages():
     return json.load(open('messages.json', 'r'))
 
 def main():
     participants = get_participants()
-
+    print(participants)
+    set_dead_participants(participants)
     img = draw_participants(participants)
     img.save('participants.png')
 

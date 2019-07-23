@@ -7,8 +7,10 @@ CONSUMER_SECRET = tweet_config['consumer_secret']
 ACCESS_TOKEN = tweet_config['access_token']
 ACCESS_TOKEN_SECRET = tweet_config['access_token_secret']
 
-
-twitter = Twython(CONSUMER_KEY, CONSUMER_SECRET,
+twitter = None
+def init():
+  global twitter
+  twitter = Twython(CONSUMER_KEY, CONSUMER_SECRET,
                   ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
 def tweet(msg, img=None):
