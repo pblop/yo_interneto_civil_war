@@ -7,6 +7,7 @@ from tweet import init as init_tweet
 from generate_image import draw_participants
 from enum import Enum
 from time import sleep
+import datetime as dt
 import os
 
 config = json.load(open('./config.json', 'r'))
@@ -88,7 +89,7 @@ def main_thread(queue):
     set_dead_participants(participants)
     messages = get_messages()
 
-    log(messages['start'].format(len(participants)), -1, participants)
+    queue.log(messages['start'].format(len(participants)), -1, participants)
 
     encounter_duration = config['encounter_duration']
     encounter_delay = config['encounter_delay']
@@ -96,6 +97,10 @@ def main_thread(queue):
     i = 0
     alive_participants = [participant for participant in participants if participant.isalive()]
     while len(alive_participants) > 1:
+        # Espera hasta que la hora esté entre las 12 y las 23, incluidas
+        while not 12 <= dt.datetime.now().hour <= 23:
+            print('.', end='', flush=True)
+            sleep(10)
         p1, p2 = random.sample(alive_participants, 2)
 
         queue.log(messages['encounter'].format(p1.name, p2.name), i, participants=None)

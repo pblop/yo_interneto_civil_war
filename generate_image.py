@@ -59,7 +59,7 @@ def draw_names(height, width, height_margin, width_margin, columns, max_name_hei
 
   return img
 
-def draw_participants(participants, VERT_AND_HTAL_MARGIN = 0.1, COLUMN_MARGIN = 0.2, PARTICIPANTS_PER_COLUMN = 10):
+def draw_participants(participants, VERT_AND_HTAL_MARGIN = 0.1, COLUMN_MARGIN = 0.2, PARTICIPANTS_PER_COLUMN = 30):
   columns = math.ceil(len(participants)/PARTICIPANTS_PER_COLUMN)
   participants_by_column = [participants[x:x+PARTICIPANTS_PER_COLUMN] for x in range(0, len(participants), PARTICIPANTS_PER_COLUMN)]
 
@@ -84,3 +84,37 @@ def draw_participants(participants, VERT_AND_HTAL_MARGIN = 0.1, COLUMN_MARGIN = 
 
   img = draw_names(image_height, image_width, image_height_margin, image_width_margin, columns, max_name_height, max_column_width, participants_by_column, font)
   return img
+
+if __name__ == '__main__':
+  def get_participants():
+    participants = []
+    with open('participants.txt', 'r') as f:
+      while True:
+        line = f.readline()
+        if line == '':
+          break
+        name = line.replace('\n', '')
+        participants.append(Participant(name))
+    return participants
+
+  def set_dead_participants(participants):
+    with open('dead.txt', 'r') as f:
+      while True:
+        line = f.readline()
+        if line == '':
+          break
+        name = line.replace('\n', '')
+        participant = [participant for participant in participants if participant.name == name][0]
+        participant.alive = False
+
+  class Participant:
+    def __init__(self, name):
+      self.name = name
+      self.alive = True
+
+    def isalive(self):
+      return self.alive
+
+  participants = get_participants()
+  set_dead_participants(participants)
+  draw_participants(participants).save('participants.png')
